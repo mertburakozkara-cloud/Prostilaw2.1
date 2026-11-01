@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Prostilaw 2.0</title>
+<link rel="manifest" href='data:application/manifest+json,{"name":"Prostilaw 2.0","short_name":"Prostilaw 2.0","display":"standalone","start_url":".","background_color":"#000000","theme_color":"#000000","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 512 512%27%3E%3Crect width=%27512%27 height=%27512%27 fill=%27%23000%27/%3E%3Ctext x=%27256%27 y=%27350%27 font-size=%27320%27 text-anchor=%27middle%27 fill=%27%23c9a24b%27 font-family=%27Georgia%27%3EP%3C/text%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml","purpose":"any"}]}'>
+<style>
+:root{--bg:#000;--panel:#0d0d0d;--line:#222;--tx:#ececec;--mut:#8a8a8a;--ac:#c9a24b;--user:#1a1a1a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}
+.logo{font:600 22px Georgia,serif;letter-spacing:.5px}.logo span{color:var(--ac)}
+.brains{font-size:12px;color:var(--mut)}
+button{font:inherit;color:var(--tx);background:none;border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+#chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.empty{margin:auto;text-align:center;color:var(--mut);max-width:300px}
+.empty b{display:block;font:600 28px Georgia,serif;color:var(--tx);margin-bottom:8px}
+.m{max-width:88%;padding:10px 14px;border-radius:14px;white-space:pre-wrap;word-wrap:break-word}
+.m.u{align-self:flex-end;background:var(--user);border-bottom-right-radius:4px}
+.m.a{align-self:flex-start;background:var(--panel);border:1px solid var(--line);border-bottom-left-radius:4px}
+.m img{max-width:100%;border-radius:8px;display:block;margin-bottom:6px}
+.chip{display:inline-block;font-size:12px;color:var(--ac);border:1px solid var(--line);border-radius:20px;padding:2px 8px;margin:0 4px 6px 0}
+details{margin-top:8px;font-size:13px;color:var(--mut)}summary{cursor:pointer;color:var(--ac)}
+details p{margin:6px 0;padding-left:8px;border-left:2px solid var(--line)}
+.bar{border-top:1px solid var(--line);padding:10px 12px;background:var(--bg)}
+#att{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.row{display:flex;gap:8px;align-items:flex-end}
+textarea{flex:1;resize:none;max-height:120px;background:var(--panel);color:var(--tx);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font:inherit}
+.ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ic{width:44px;height:44px;padding:0;display:grid;place-items:center;border-radius:50%;flex:none;font-size:18px}
+#send{background:var(--ac);color:#000;border-color:var(--ac)}
+#mic.on,#voice.on{background:var(--ac);color:#000;border-color:var(--ac)}
+dialog{background:var(--panel);color:var(--tx);border:1px solid var(--line);border-radius:16px;width:min(92vw,420px);padding:18px}
+dialog::backdrop{background:rgba(0,0,0,.8)}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
+input{width:100%;background:#000;color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
+.hint{font-size:12px;color:var(--mut);margin-top:12px}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="logo">Pro<span>sti</span>law 2.0</div><div class="brains" id="brains"></div></div>
+  <button id="cfg" aria-label="Ayarlar">Ayarlar</button>
+</header>
+<div id="chat"><div class="empty" id="empty"><b>Prostilaw 2.0</b>Merhaba, size nasıl yardımcı olabilirim? Önce Ayarlar bölümünden API anahtarlarınızı ekleyin.</div></div>
+<div class="bar">
+  <div id="att"></div>
+  <div class="row">
+    <button class="ic" id="clip" aria-label="Dosya veya görsel ekle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+    <textarea id="in" rows="1" placeholder="Bir şey yazın…"></textarea>
+    <button class="ic" id="mic" aria-label="Sesle yaz"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+    <button class="ic" id="voice" aria-label="Sesli sohbet"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6L8 10H4z"/><path d="M16.5 9a4 4 0 0 1 0 6"/></svg></button>
+    <button class="ic" id="send" aria-label="Gönder"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+  </div>
+  <input type="file" id="file" multiple accept="image/*,.txt,.md,.csv,.json,.html,.js,.py,.xml,.log" hidden>
+</div>
+
+<dialog id="dlg">
+  <b style="font:600 20px Georgia,serif">Ayarlar</b>
+  <label>Gemini API anahtarı</label><input id="k_gemini" type="password" autocomplete="off">
+  <label>Claude API anahtarı</label><input id="k_claude" type="password" autocomplete="off">
+  <label>ChatGPT (OpenAI) API anahtarı</label><input id="k_gpt" type="password" autocomplete="off">
+  <label>Grok (xAI) API anahtarı — yardımcı beyin</label><input id="k_grok" type="password" autocomplete="off">
+  <p class="hint">Anahtarlar yalnızca bu cihazda saklanır. Üç ana beyin soruyu yanıtlar, Grok yanıtları birleştirip son cevabı oluşturur.</p>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+    <button id="clr">Sohbeti temizle</button><button id="save" style="background:var(--ac);color:#000;border-color:var(--ac)">Kaydet</button>
+  </div>
+</dialog>
+
+<script>
+const MODELS={gemini:"gemini-3.8-flash",claude:"claude-sonnet-5-5",gpt:"gpt-4o",grok:"grok-4"};
+const NAMES={gemini:"Gemini",claude:"Claude",gpt:"ChatGPT",grok:"Grok"};
+const SYS="Sen Prostilaw 2.0 adlı yardımcı, saygılı ve kibar bir yapay zekasın. Her zaman Türkçe yanıt ver.";
+const $=id=>document.getElementById(id);
+const store={get:k=>{try{return localStorage.getItem(k)||""}catch(e){return ""}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+let history=[],atts=[],voiceMode=false,rec=null,busy=false;
+
+function keys(){const o={};for(const n of Object.keys(NAMES))o[n]=store.get("pl_"+n);return o}
+function refresh(){const k=keys();const on=["gemini","claude","gpt"].filter(n=>k[n]).map(n=>NAMES[n]);
+  $("brains").textContent=(on.length?on.join(" · "):"Beyin yok")+(k.grok?" + Grok":"")}
+refresh();
+$("cfg").onclick=()=>{const k=keys();for(const n in k)$("k_"+n).value=k[n];$("dlg").showModal()};
+$("save").onclick=()=>{for(const n in NAMES)store.set("pl_"+n,$("k_"+n).value.trim());$("dlg").close();refresh()};
+$("clr").onclick=()=>{history=[];$("chat").innerHTML="";$("dlg").close()};
+
+$("clip").onclick=()=>$("file").click();
+$("file").onchange=async e=>{
+  for(const f of e.target.files){
+    if(f.type.startsWith("image/")){atts.push({name:f.name,type:f.type,data:await b64(f)})}
+    else{atts.push({name:f.name,text:await f.text()})}
+  }
+  e.target.value="";drawAtt()};
+function b64(f){return new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(f)})}
+function drawAtt(){$("att").innerHTML="";atts.forEach((a,i)=>{const c=document.createElement("button");c.className="chip";c.textContent=a.name+" ×";c.onclick=()=>{atts.splice(i,1);drawAtt()};$("att").append(c)})}
+
+$("in").addEventListener("input",e=>{e.target.style.height="auto";e.target.style.height=Math.min(e.target.scrollHeight,120)+"px"});
+$("send").onclick=()=>send($("in").value);
+$("in").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&innerWidth>700){e.preventDefault();send($("in").value)}});
+
+function bubble(cls,text,imgs){
+  $("empty")&&$("empty").remove();
+  const d=document.createElement("div");d.className="m "+cls;
+  (imgs||[]).forEach(a=>{const im=new Image();im.src=`data:${a.type};base64,${a.data}`;d.append(im)});
+  const s=document.createElement("span");s.textContent=text;d.append(s);
+  $("chat").append(d);$("chat").scrollTop=1e9;return d}
+
+async function post(url,headers,body){
+  const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json",...headers},body:JSON.stringify(body)});
+  const j=await r.json();if(!r.ok)throw new Error(j.error?.message||j.error||r.status);return j}
+
+function oaiMsgs(sys,hist,imgs){
+  const m=[{role:"system",content:sys}];
+  hist.forEach((h,i)=>{
+    const last=i===hist.length-1&&imgs.length;
+    m.push({role:h.role,content:last?[{type:"text",text:h.text},...imgs.map(a=>({type:"image_url",image_url:{url:`data:${a.type};base64,${a.data}`}}))]:h.text})});
+  return m}
+
+const ask={
+  async gpt(k,hist,imgs){const j=await post("https://api.openai.com/v1/chat/completions",{Authorization:"Bearer "+k},{model:MODELS.gpt,messages:oaiMsgs(SYS,hist,imgs)});return j.choices[0].message.content},
+  async grok(k,hist,imgs,sys){const j=await post("https://api.x.ai/v1/chat/completions",{Authorization:"Bearer "+k},{model:MODELS.grok,messages:oaiMsgs(sys||SYS,hist,imgs)});return j.choices[0].message.content},
+  async claude(k,hist,imgs){
+    const messages=hist.map((h,i)=>({role:h.role,content:(i===hist.length-1&&imgs.length)?[...imgs.map(a=>({type:"image",source:{type:"base64",media_type:a.type,data:a.data}})),{type:"text",text:h.text}]:h.text}));
+    const j=await post("https://api.anthropic.com/v1/messages",{"x-api-key":k,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},{model:MODELS.claude,max_tokens:2000,system:SYS,messages});
+    return j.content.map(c=>c.text||"").join("")},
+  async gemini(k,hist,imgs){
+    const contents=hist.map((h,i)=>({role:h.role==="assistant"?"model":"user",parts:[{text:h.text},...((i===hist.length-1)?imgs.map(a=>({inlineData:{mimeType:a.type,data:a.data}})):[])]}));
+    const j=await post(`https://generativelanguage.googleapis.com/v1beta/models/${MODELS.gemini}:generateContent?key=${encodeURIComponent(k)}`,{},{systemInstruction:{parts:[{text:SYS}]},contents});
+    return j.candidates[0].content.parts.map(p=>p.text||"").join("")}
+};
+
+async function send(raw){
+  const text=raw.trim();if((!text&&!atts.length)||busy)return;
+  const k=keys();const main=["gemini","claude","gpt"].filter(n=>k[n]);
+  if(!main.length&&!k.grok){bubble("a","Önce Ayarlar bölümünden en az bir API anahtarı ekleyin.");return}
+  busy=true;$("in").value="";$("in").style.height="auto";
+  const imgs=atts.filter(a=>a.data),docs=atts.filter(a=>a.text);
+  let full=text;docs.forEach(d=>full+=`\n\n[Dosya: ${d.name}]\n${d.text.slice(0,30000)}`);
+  bubble("u",text||"(ek gönderildi)",imgs);
+  atts=[];drawAtt();
+  history.push({role:"user",text:full||"Bu görseli incele."});
+  const wait=bubble("a","Beyinler düşünüyor…");
+  const results={};
+  const pool=main.length?main:["grok"];
+  await Promise.all(pool.map(async n=>{try{results[n]=await ask[n](k[n],history,imgs)}catch(e){results[n]="Hata: "+e.message}}));
+  const good=pool.filter(n=>!results[n].startsWith("Hata:"));
+  let final;
+  try{
+    if(k.grok&&main.length&&good.length){
+      const pack=good.map(n=>`### ${NAMES[n]} yanıtı\n${results[n]}`).join("\n\n");
+      final=await ask.grok(k.grok,[{role:"user",text:`Kullanıcının sorusu:\n${full}\n\nAşağıda farklı yapay zekaların yanıtları var. Bunları karşılaştır, hataları ayıkla, en doğru ve eksiksiz tek bir nihai cevap yaz. Yalnızca nihai cevabı ver.\n\n${pack}`}],[],SYS)}
+    else final=good.length?results[good[0]]:Object.values(results)[0];
+  }catch(e){final=good.length?results[good[0]]:"Hata: "+e.message}
+  wait.remove();
+  const b=bubble("a",final);
+  if(pool.length>1||k.grok){const d=document.createElement("details");d.innerHTML="<summary>Beyinlerin yanıtları</summary>";
+    pool.forEach(n=>{const p=document.createElement("p");p.textContent=NAMES[n]+": "+results[n];d.append(p)});b.append(d)}
+  history.push({role:"assistant",text:final});
+  busy=false;
+  if(voiceMode){speak(final,()=>listen())}
+}
+
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+function note(t){bubble("a",t)}
+function stopVoice(){voiceMode=false;$("voice").classList.remove("on");$("mic").classList.remove("on");speechSynthesis.cancel()}
+async function listen(){
+  if(!isSecureContext){note("Mikrofon yalnızca https adresinde çalışır. Dosyayı yerel olarak açmak yerine bir https adresine yükleyin ve Chrome ile açın.");stopVoice();return}
+  if(!SR){note("Bu tarayıcı sesli girişi desteklemiyor. Android’de Chrome kullanın.");stopVoice();return}
+  try{const st=await navigator.mediaDevices.getUserMedia({audio:true});st.getTracks().forEach(t=>t.stop())}
+  catch(e){note("Mikrofon izni verilmedi. Adres çubuğundaki kilit simgesinden Mikrofon iznini açın, sonra tekrar deneyin.");stopVoice();return}
+  try{rec&&rec.stop()}catch(e){}
+  rec=new SR();rec.lang="tr-TR";rec.interimResults=false;
+  $("mic").classList.add("on");
+  rec.onresult=e=>{const t=e.results[0][0].transcript;if(voiceMode)send(t);else $("in").value=t};
+  rec.onend=()=>{$("mic").classList.remove("on");if(voiceMode&&!busy&&!speechSynthesis.speaking)setTimeout(()=>voiceMode&&!busy&&listen(),400)};
+  rec.onerror=e=>{$("mic").classList.remove("on");
+    if(e.error==="not-allowed"||e.error==="service-not-allowed"){note("Mikrofon izni engellendi.");stopVoice()}
+    else if(e.error==="network"){note("Ses tanıma için internet bağlantısı gerekli.");stopVoice()}}
+  rec.start()}
+$("mic").onclick=()=>{if($("mic").classList.contains("on")){rec&&rec.stop()}else listen()};
+$("voice").onclick=()=>{
+  voiceMode=!voiceMode;$("voice").classList.toggle("on",voiceMode);
+  if(voiceMode)listen();else{stopVoice();try{rec&&rec.stop()}catch(e){}}};
+function speak(t,done){
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t.replace(/[#*`_]/g,"").slice(0,1500));u.lang="tr-TR";
+  u.onend=()=>{if(voiceMode&&done)done()};u.onerror=()=>{};speechSynthesis.speak(u)}
+</script>
+</body>
+</html>
